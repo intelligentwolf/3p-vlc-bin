@@ -11,7 +11,7 @@ pluginsdir=${pkglibdir}/plugins
 
 Name: VLC plugin API
 Description: VLC media player plugin interface
-Version: 3.0.21
+Version: 3.0.24
 Cflags: -I${includedir} -I${pkgincludedir}/plugins \
 	-D__PLUGIN__ \
 	-D_FILE_OFFSET_BITS=64 \
@@ -20,5 +20,5 @@ Cflags: -I${includedir} -I${pkgincludedir}/plugins \
 	-D_THREAD_SAFE
 Libs: -L${libdir} -lvlccore
 Libs.private:  \
-	-L/builds/videolan/vlc/contrib/x86_64-w64-mingw32/lib -lintl -L/builds/videolan/vlc/contrib/x86_64-w64-mingw32/lib -liconv -L/builds/videolan/vlc/contrib/x86_64-w64-mingw32/lib -liconv \
+	-L/builds/videolan/vlc/contrib/x86_64-w64-mingw32/lib -lintl -ladvapi32 -L/builds/videolan/vlc/contrib/x86_64-w64-mingw32/lib -liconv -L/builds/videolan/vlc/contrib/x86_64-w64-mingw32/lib -liconv \
 	-lws2_32 -liphlpapi  -lm

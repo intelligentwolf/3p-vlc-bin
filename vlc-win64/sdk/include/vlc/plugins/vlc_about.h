@@ -1270,6 +1270,7 @@ static const char psz_authors[] =
 "أحمد المحم ودي (Ahmed El-Mahmoudy)\n"
 "Баярсайхан Энхтайван\n"
 "Сергей Дарьичев\n"
+"Noah Davis\n"
 "\n"
 "Artwork\n"
 "-------\n"
