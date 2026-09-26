@@ -1,0 +1,41 @@
+# IntelligentWolf 2026-09-26: extract the macOS VLC libraries from VideoLAN's official universal
+# .dmg on a macOS runner (hdiutil), the files vlc-darwin64/ has always held (see commit dd85bee:
+# lib/libvlc*.dylib, plugins/*.dylib + plugins.dat, include/vlc, share, VLC, COPYING.txt).
+# Manual only; the result comes back as a build artifact and is committed by hand.
+name: Import VLC macOS
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: VLC version
+        required: true
+      sha256:
+        description: SHA-256 of vlc-<version>-universal.dmg (from download.videolan.org)
+        required: true
+jobs:
+  import:
+    runs-on: macos-15
+    steps:
+      - name: Download and verify
+        run: |
+          set -eu
+          curl -fL -o vlc.dmg "https://download.videolan.org/pub/videolan/vlc/${{ inputs.version }}/macosx/vlc-${{ inputs.version }}-universal.dmg"
+          echo "${{ inputs.sha256 }}  vlc.dmg" | shasum -a 256 -c -
+      - name: Extract
+        run: |
+          set -eu
+          hdiutil attach -nobrowse -readonly -mountpoint /tmp/vlc vlc.dmg
+          M=/tmp/vlc/VLC.app/Contents/MacOS
+          ls -la "$M"; ls "$M/include" || true
+          mkdir -p out/vlc-darwin64
+          cp -R "$M/lib" "$M/plugins" "$M/share" out/vlc-darwin64/
+          cp "$M/VLC" out/vlc-darwin64/
+          if [ -d "$M/include" ]; then cp -R "$M/include" out/vlc-darwin64/; fi
+          cp /tmp/vlc/COPYING.txt out/vlc-darwin64/ 2>/dev/null || cp "/tmp/vlc/VLC.app/Contents/Resources/COPYING" out/vlc-darwin64/COPYING.txt 2>/dev/null || true
+          ls -R out/vlc-darwin64 | head -60
+          lipo -info out/vlc-darwin64/lib/libvlc.dylib
+          hdiutil detach /tmp/vlc
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vlc-darwin64-${{ inputs.version }}
+          path: out/vlc-darwin64
